@@ -1,0 +1,32 @@
+CREATE EXTENSION IF NOT EXISTS citext;
+
+CREATE TABLE IF NOT EXISTS users (
+  id BIGSERIAL PRIMARY KEY,
+  username CITEXT UNIQUE NOT NULL,
+  password TEXT,
+  avatar TEXT,
+  is_admin BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS posts (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT REFERENCES users (id),
+  content TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS follows (
+  user_id BIGINT NOT NULL REFERENCES users (id),
+  follower_id BIGINT NOT NULL REFERENCES users (id),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, follower_id)
+);
+
+CREATE INDEX IF NOT EXISTS posts_user_id_index ON posts (user_id);
+CREATE INDEX IF NOT EXISTS follows_user_id_index ON follows (user_id);
+CREATE INDEX IF NOT EXISTS follows_follower_id_index ON follows (follower_id);
+
